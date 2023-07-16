@@ -17,9 +17,9 @@ Resources:
       Environment:
         Variables:
           REGION: !Ref "AWS::Region"
-          KENDRA_INDEX_ID: "***KENDRA_INDEX_ID***"
-          SM_ENDPOINT_NAME: "***SAGEMAKER_ENDPOINT_NAME***"
-          SM_MODEL_TYPE: "***SM_MODEL_TYPE***" # flan | falcon
+          KENDRA_INDEX_ID: "e5a575ca-5dad-41b5-8c02-2dd97cb87532"
+          SM_ENDPOINT_NAME: "gen-ai-workshop-falcon-7b-instruct"
+          SM_MODEL_TYPE: "falcon" # flan | falcon
       Role: !GetAtt LambdaExecutionRole.Arn
       Events:
         ApiEvent:
@@ -164,7 +164,7 @@ Resources:
       LoadBalancers:
         - TargetGroupArn: !Ref TargetGroup
           ContainerPort: 80
-          ContainerName: rag-app
+          ContainerName: gen-ai-streamlit-fe
       NetworkConfiguration:
         AwsvpcConfiguration:
           Subnets:
@@ -186,13 +186,13 @@ Resources:
       ExecutionRoleArn: !GetAtt EcsTaskExecutionRole.Arn
       TaskRoleArn: !GetAtt EcsTaskExecutionRole.Arn
       ContainerDefinitions:
-      - Name: rag-app
+      - Name: gen-ai-streamlit-fe
         Image: !Join
                   - ''
                   - - !Ref "AWS::AccountId"
                     - ".dkr.ecr."
                     - !Ref "AWS::Region"
-                    - ".amazonaws.com/rag-app:latest"
+                    - ".amazonaws.com/gen-ai-streamlit-fe:latest"
         LogConfiguration:
           LogDriver: awslogs
           Options:
