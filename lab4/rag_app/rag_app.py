@@ -15,7 +15,6 @@ from langchain.retrievers import AmazonKendraRetriever
 REGION = os.environ.get('REGION')
 KENDRA_INDEX_ID = os.environ.get('KENDRA_INDEX_ID')
 SM_ENDPOINT_NAME = os.environ.get('SM_ENDPOINT_NAME')
-SM_MODEL_TYPE = os.environ.get('SM_MODEL_TYPE') # falcon for jumpstart model - Falcon 7B Instruct BF16 or flan for jumpstart model - Flan-T5 XXL 
 
 
 # Generative LLM 
@@ -23,27 +22,28 @@ class ContentHandler(LLMContentHandler):
     content_type = "application/json"
     accepts = "application/json"
     def transform_input(self, prompt, model_kwargs):
-        if SM_MODEL_TYPE == "falcon":
-            input_str = json.dumps({"inputs": prompt, **model_kwargs})
-            return input_str.encode('utf-8')
-        if SM_MODEL_TYPE == "flan":
-            input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
-            return input_str.encode('utf-8') 
-            
+        input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
+        print(input_str)
+        return input_str.encode('utf-8')
         
+            
     def transform_output(self, output):
         response_json = json.loads(output.read().decode("utf-8"))
-        if SM_MODEL_TYPE == "falcon":
-            return response_json[0]['generated_text']
-        if SM_MODEL_TYPE == "flan":
-            return response_json["generated_texts"][0]
+        print(response_json)
+        return response_json[0]['generated_text']
+        
 
 content_handler = ContentHandler()
 
-if SM_MODEL_TYPE == "falcon":
-    kwargs = {"parameters": {"do_sample": True, "max_length": 2000, "num_return_sequences": 1, "top_k": 10, "temperature":0.9}}
-if SM_MODEL_TYPE == "flan":
-    kwargs = {"do_sample": True,"temperature": 0.9, "max_length": 2000}
+
+kwargs = {"parameters": 
+    {
+        "do_sample": True, 
+        "max_length": 2000, 
+        "num_return_sequences": 1, 
+        "top_k": 10, 
+        "temperature":0.9}
+    }
     
 # SageMaker langchain integration, to assist invoking SageMaker endpoint.
 llm=SagemakerEndpoint(
@@ -89,5 +89,5 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': json.dumps(f"{SM_MODEL_TYPE}: {clean_response}")
+        'body': json.dumps(f"{clean_response}")
         }

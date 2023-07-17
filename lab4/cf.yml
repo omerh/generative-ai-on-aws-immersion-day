@@ -7,7 +7,4 @@ Resources:
     Properties:
       Location: template.yml
 
-Outputs:
-  LoadBalancerUrl:
-    Description: URL of the load balancer
-    Value: !Sub "http://${LoadBalancer.DNSName}"
+

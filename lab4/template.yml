@@ -17,7 +17,7 @@ Resources:
       Environment:
         Variables:
           REGION: !Ref "AWS::Region"
-          KENDRA_INDEX_ID: "e5a575ca-5dad-41b5-8c02-2dd97cb87532"
+          KENDRA_INDEX_ID: "27e4dd85-0cd8-4d6c-8b63-5f439790007f"
           SM_ENDPOINT_NAME: "gen-ai-workshop-falcon-7b-instruct"
           SM_MODEL_TYPE: "falcon" # flan | falcon
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -155,7 +155,6 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn: 
       - LoadBalancerListener
-      - SecurityGroupEcs
     Properties:
       Cluster: !Ref ECSCluster
       DesiredCount: 1
@@ -277,7 +276,7 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
-  LoadBalancer:
+  ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: rag-load-balancer
@@ -289,7 +288,7 @@ Resources:
   LoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref LoadBalancer
+      LoadBalancerArn: !Ref ALB
       Port: 80
       Protocol: HTTP
       DefaultActions:
@@ -315,6 +314,12 @@ Resources:
         - AttributeName: SessionId
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
-        
+
+Outputs:
+  ALBEndpoint:
+    Value: !GetAtt 'ALB.DNSName'
+    Description: 'LoadBalancer DNS name'
+  ALBDNSUrl:
+    Value: !Sub 'http://${ALB.DNSName}'
     
 
