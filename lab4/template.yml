@@ -13,13 +13,12 @@ Resources:
       Handler: rag_app.lambda_handler
       Runtime: python3.10
       PackageType: Zip
-      Timeout: 60
+      Timeout: 65
       Environment:
         Variables:
           REGION: !Ref "AWS::Region"
-          KENDRA_INDEX_ID: "27e4dd85-0cd8-4d6c-8b63-5f439790007f"
+          KENDRA_INDEX_ID: "***KENDRA_INDEX_ID***"
           SM_ENDPOINT_NAME: "gen-ai-workshop-falcon-7b-instruct"
-          SM_MODEL_TYPE: "falcon" # flan | falcon
       Role: !GetAtt LambdaExecutionRole.Arn
       Events:
         ApiEvent:
