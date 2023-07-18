@@ -30,20 +30,13 @@ class ContentHandler(LLMContentHandler):
     def transform_output(self, output):
         response_json = json.loads(output.read().decode("utf-8"))
         print(response_json)
-        return response_json[0]['generated_text']
+        return response_json['generated_texts'][0]
         
 
 content_handler = ContentHandler()
 
 
-kwargs = {"parameters": 
-    {
-        "do_sample": True, 
-        "max_length": 2000, 
-        "num_return_sequences": 1, 
-        "top_k": 10, 
-        "temperature":0.9}
-    }
+kwargs = {"do_sample": True, "top_p": 0.9,"max_new_tokens": 10024, "top_k": 1, "temperature":0.9}
     
 # SageMaker langchain integration, to assist invoking SageMaker endpoint.
 llm=SagemakerEndpoint(
@@ -72,12 +65,13 @@ def lambda_handler(event, context):
     print(uuid)
 
     message_history = DynamoDBChatMessageHistory(table_name="MemoryTable", session_id=uuid)
-    memory = ConversationBufferWindowMemory(memory_key="chat_history", chat_memory=message_history, return_messages=True, k=3)
+    memory = ConversationBufferWindowMemory(memory_key="chat_history", chat_memory=message_history, return_messages=True, k=1)
     
     # This retriever is using the new Kendra retrieve API https://aws.amazon.com/blogs/machine-learning/quickly-build-high-accuracy-generative-ai-applications-on-enterprise-data-using-amazon-kendra-langchain-and-large-language-models/
     retriever = AmazonKendraRetriever(
         index_id=KENDRA_INDEX_ID,
         region_name=REGION,
+        top_k=1
     )
     
     retriever.get_relevant_documents(query)
