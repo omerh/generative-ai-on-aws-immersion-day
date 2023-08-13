@@ -41,7 +41,7 @@ kwargs = {"do_sample": True, "top_p": 0.9,"max_new_tokens": 10024, "top_k": 1, "
 # SageMaker langchain integration, to assist invoking SageMaker endpoint.
 llm=SagemakerEndpoint(
     endpoint_name=SM_ENDPOINT_NAME,
-    model_kwargs=kwargs,
+#    model_kwargs=kwargs,
     region_name=REGION,
     content_handler=content_handler, 
 )
@@ -74,7 +74,7 @@ def lambda_handler(event, context):
         top_k=1
     )
     
-    retriever.get_relevant_documents(query)
+    # retriever.get_relevant_documents(query)
     
     qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory, condense_question_prompt=CONDENSE_QUESTION_PROMPT, verbose=True)
         
